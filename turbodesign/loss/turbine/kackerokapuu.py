@@ -62,8 +62,9 @@ class KackerOkapuu(LossBaseClass):
         Returns:
             numpy.ndarray: Pressure loss coefficient array matching ``row.r``.
         """
-        # Get the Inlet incoming mach number relative to the blade
-        c = row.chord
+        # Kacker-Okapuu is a mean-line correlation: use the chord from the
+        # span-averaged stagger. row.chord is spanwise when the stagger is.
+        c = row.axial_chord / np.cos(np.radians(_mean_value(row.stagger)))
         b = row.axial_chord
         if row.row_type == RowType.Stator:
             beta1_rad = np.abs(_mean_value(np.radians(row.beta1_metal))) # Metal angle from fig 3
@@ -74,12 +75,12 @@ class KackerOkapuu(LossBaseClass):
             M1 = _mean_value(upstream.M)
             M2 = _mean_value(row.M)
             h = 0
-            Rec = _mean_value(row.V*row.rho*row.chord / sutherland(row.T))
+            Rec = _mean_value(row.V*row.rho*c / sutherland(row.T))
             
             beta1_deg = np.abs(np.degrees(beta1_rad))
             alpha2_deg = np.abs(np.degrees(alpha2_rad))
-            Yp_beta0 = self.data['Fig01_beta0'](float(row.pitch_to_chord), alpha2_deg)  # when beta1 = 0 
-            Yp_beta1_alpha2 = self.data['Fig02'](float(row.pitch_to_chord), alpha2_deg) # When beta1 = alpha2
+            Yp_beta0 = self.data['Fig01_beta0'](_mean_value(row.pitch_to_chord), alpha2_deg)  # when beta1 = 0 
+            Yp_beta1_alpha2 = self.data['Fig02'](_mean_value(row.pitch_to_chord), alpha2_deg) # When beta1 = alpha2
             t_max_c = self.data['Fig04'](beta1_deg+alpha2_deg)
         else:
             h = row.tip_clearance * (row.r[-1]-row.r[0])
@@ -90,12 +91,12 @@ class KackerOkapuu(LossBaseClass):
             alpham_rad = (beta1_rad + beta2_rad)*0.5
             M1 = _mean_value(upstream.M_rel) 
             M2 = _mean_value(row.M_rel)
-            Rec = _mean_value(row.W*row.rho*row.chord / sutherland(row.T))
+            Rec = _mean_value(row.W*row.rho*c / sutherland(row.T))
 
             beta1_deg = np.abs(np.degrees(beta1_rad))
             alpha2_deg = np.abs(np.degrees(beta2_rad))
-            Yp_beta0 = self.data['Fig01_beta0'](float(row.pitch_to_chord), alpha2_deg)  # when beta1 = 0 
-            Yp_beta1_alpha2 = self.data['Fig02'](float(row.pitch_to_chord), alpha2_deg) # When beta1 = alpha2
+            Yp_beta0 = self.data['Fig01_beta0'](_mean_value(row.pitch_to_chord), alpha2_deg)  # when beta1 = 0 
+            Yp_beta1_alpha2 = self.data['Fig02'](_mean_value(row.pitch_to_chord), alpha2_deg) # When beta1 = alpha2
             t_max_c = self.data['Fig04'](beta1_deg+alpha2_deg)
         
         ratio = beta1_rad / alpha2_rad
@@ -150,9 +151,9 @@ class KackerOkapuu(LossBaseClass):
         
         # Trailing Edge
         if np.abs(beta1_deg-np.degrees(beta2_rad))<5: # impulse turbine the inlet and exit angles are the same
-            delta_phi2 = self.data['Fig14_Impulse'](float(row.te_pitch*row.pitch / row.throat))
+            delta_phi2 = self.data['Fig14_Impulse'](_mean_value(row.te_pitch*row.pitch / row.throat))
         else:
-            delta_phi2 = self.data['Fig14_Axial_Entry'](float(row.te_pitch*row.pitch / row.throat))
+            delta_phi2 = self.data['Fig14_Axial_Entry'](_mean_value(row.te_pitch*row.pitch / row.throat))
         
         Ytet = (1-(row.gamma-1)/2 * M2**2 * (1/(1-delta_phi2)-1)) **(-row.gamma/(row.gamma-1)) - 1 # Equation 18
         Ytet = Ytet / (1-(1+(row.gamma-1)/2*M2**2)**(-row.gamma/(row.gamma-1)))
