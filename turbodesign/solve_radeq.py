@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from .radeq import radeq
 from .enums import LossType, RowType, PowerType
 from .bladerow import BladeRow
@@ -11,19 +11,22 @@ from scipy.interpolate import interp1d
 from scipy.optimize import minimize_scalar
 from .passage import Passage     
     
-def adjust_streamlines(blade_rows:List[BladeRow],passage:Passage,massflow_fraction:np.ndarray):
+def adjust_streamlines(blade_rows:List[BladeRow],passage:Passage,massflow_fraction:Optional[np.ndarray]=None):
     """Adjust the streamlines to evenly divide the massflow
 
     Args:
         blade_rows (List[BladeRow]): List of blade rows
-        passage (Passage): passage object describing the hub and shroud 
-        massflow_fraction (np.ndarray): array from 0 to 1 of how the massflow should be distributed from hub to shroud
+        passage (Passage): passage object describing the hub and shroud
+        massflow_fraction (np.ndarray, optional): array from 0 to 1 of how the massflow should be distributed from hub to shroud.
+            Defaults to an even split between the row's streamlines.
     """
     for row_index,row in enumerate(blade_rows):
         print(f"Adjusting Streamlines to balance massflow Row: {row_index}")
         row.total_massflow = row.massflow[-1]
-        
-        new_percent_streamline = interp1d(row.massflow,row.percent_hub_shroud)(massflow_fraction[1:-1])
+        fraction = np.linspace(0, 1, len(row.percent_hub_shroud)) if massflow_fraction is None else np.asarray(massflow_fraction)
+
+        # row.massflow is cumulative from hub to shroud in kg/s, so the targets are fractions of the total
+        new_percent_streamline = interp1d(row.massflow,row.percent_hub_shroud)(fraction[1:-1]*row.total_massflow)
         row.percent_hub_shroud[1:-1] = new_percent_streamline 
 
         cut_line, thub,_ = passage.get_cutting_line(row.percent_hub)
