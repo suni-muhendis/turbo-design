@@ -13,7 +13,7 @@ Each change is one commit on the `sm` branch, on top of upstream release 1.4.4
 (`4be23d1`). Releases of this fork are tagged `v<upstream>-sm.<n>` and carry the
 version `<upstream>+sm.<n>`.
 
-## 1.4.4+sm.1 — 2026-09-29
+## 1.4.4+sm.1 — 2026-09-30
 
 Changes that alter results are marked **(changes results)**; the others leave
 every result unchanged for inputs that worked before them.
@@ -39,6 +39,10 @@ every result unchanged for inputs that worked before them.
 5. **Radial equilibrium uses the static pressure** **(changes results)**.
    `radeq` used the radial gradient of the static pressure where the static
    pressure itself belongs in dP0/dr. (`radeq.py`)
+   The characterization goldens in `tests/test_axial_characterization.py` and
+   `tests/test_turbine_characterization.py` are re-baselined for this change
+   alone (largest moves: Mattingly 9.1 pressure ratio 0.095%, EEE HPT up to 5.8%
+   per streamline, radial turbine rotor Mach up to 23%).
 6. **DiffusionLoss uses the Lieblein diffusion factor** **(changes results)**.
    The loading term was dVt/|U| instead of |dVt|/(2 sigma V1), which made
    every stator loss zero. (`loss/compressor/diffusion.py`)
@@ -49,3 +53,6 @@ every result unchanged for inputs that worked before them.
    (gamma_i - gamma_e) / (4 sqrt(sigma)) to the row's metal angles, keeping
    Mattingly's form for a target exit flow angle.
    (`deviation/carter_deviation.py`)
+
+The full upstream test suite passes on this release (375 passed, 4 expected
+failures).
