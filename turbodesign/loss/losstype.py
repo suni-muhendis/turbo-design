@@ -10,9 +10,9 @@ class LossBaseClass(ABC):
     _loss_type:LossType
     
     def __init__(self,lossType:LossType, is_parasitic:bool=False):
-        # Make the environment directory
+        # Make the environment directory. A TD3_HOME set by the caller is kept.
         default_home = os.path.join(os.path.expanduser("~"), ".cache")
-        os.environ['TD3_HOME'] = os.path.join(default_home,'TD3_LossModels')
+        os.environ.setdefault('TD3_HOME', os.path.join(default_home,'TD3_LossModels'))
         os.makedirs(os.environ['TD3_HOME'],exist_ok=True)
 
         self._loss_type = lossType
