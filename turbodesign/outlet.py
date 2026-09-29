@@ -9,6 +9,16 @@ import numpy as np
 import numpy.typing as npt 
 from scipy.interpolate import interp1d
 
+def _spanwise(values, percent_radii: npt.NDArray) -> npt.NDArray:
+    """A value per radius in percent_radii: a single value is uniform, a list keeps its profile."""
+    values = convert_to_ndarray(values)
+    if values.size == 1:
+        return values[0] + 0*percent_radii
+    if values.size != percent_radii.size:
+        raise ValueError("Expected one pressure or one per percent radius; got {} for {} radii".format(
+            values.size, percent_radii.size))
+    return values.astype(float)
+
 class OutletType(Enum):
     static_pressure = 1
     total_pressure = 2
@@ -44,10 +54,10 @@ class Outlet(BladeRow):
             massflow (float | None): initialize with a massflow. Note this is only valid if you set the solver to solve to MassflowConstraint.AngleMatch
         """
         self.percent_hub_shroud = convert_to_ndarray(percent_radii)
+        self.P = _spanwise(P, self.percent_hub_shroud)
         if len(self.percent_hub_shroud)==1:
             self.percent_hub_shroud = np.linspace(0,1,self.num_streamlines)
-        self.P = convert_to_ndarray(P)
-        self.P = self.P[0]+0*self.percent_hub_shroud*0
+            self.P = self.P[0]+0*self.percent_hub_shroud
         self.P_fun = interp1d(self.percent_hub_shroud,self.P)
         
         if massflow is not None:
@@ -66,8 +76,7 @@ class Outlet(BladeRow):
 
         self.percent_hub_shroud = convert_to_ndarray(percent_radii)
         self.IsCompressor = True
-        self.P0 = convert_to_ndarray(P0)
-        self.P0 = self.P0[0]+0*self.percent_hub_shroud*0
+        self.P0 = _spanwise(P0, self.percent_hub_shroud)
         self.P0_fun = interp1d(self.percent_hub_shroud,self.P0)
         self.IsCompressor = True
         self.outlet_type = OutletType.total_pressure
