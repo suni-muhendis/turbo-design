@@ -88,7 +88,7 @@ def radeq(row:BladeRow,upstream:BladeRow,downstream:Optional[BladeRow]=None) -> 
         # Upstream 
         dT_dr = float(interp1d(row_radius, np.gradient(row.T,row_radius))(r))
         dP_dr = float(interp1d(row_radius, np.gradient(row.P,row_radius))(r))
-        P = float(interp1d(row_radius, np.gradient(row.P,row_radius))(r))
+        P = float(interp1d(row_radius, row.P)(r))
         dT0_dr = dT_dr + Vm/Cp * (1 + np.tan(alpha)**2)*dVm_dr 
         dP0_dr = dP_dr * (T0/T)**(gamma/(gamma-1)) + P*gamma/(gamma-1) * (T0/T)**(1/(gamma-1)) * (T*dT0_dr-T0*dT_dr)/T**2
         # dT0_dr = float(interp1d(row.percent_hub_shroud, np.gradient(row.T0,row_radius))((r-row_radius[0])/(row_radius[-1]-row_radius[0]))) 
