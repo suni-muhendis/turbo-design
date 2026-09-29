@@ -1,4 +1,11 @@
 # Turbo Design 3
+
+> **Suni Muhendis fork.** This is a fork of
+> [nasa/turbo-design](https://github.com/nasa/turbo-design) with the fixes listed in
+> [MODIFICATIONS.md](MODIFICATIONS.md), released as tags `v<upstream>-sm.<n>`. It is not
+> endorsed by NASA. Licensed under the NASA Open Source Agreement 1.3
+> ([LICENSE-NOSA-1.3.txt](LICENSE-NOSA-1.3.txt)).
+
 This tool is a streamline turbomachinery design tool solving the radial equilibrium equations. It can be used for designing compressors and turbines. The designs can have counter rotating stages, different working fluids, and cooling. The intent of this tool is to enable added flexibility in which loss models are used. Because it's a python, it can connect with custom machine learning based loss models.
 
 ## Table of Contents
