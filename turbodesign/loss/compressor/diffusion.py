@@ -34,24 +34,25 @@ class DiffusionLoss(LossBaseClass):
     def __call__(self, row: "BladeRow", upstream: "BladeRow") -> npt.NDArray:
         """Return pressure-loss coefficient Yp based on diffusion factor."""
         # Choose absolute vs relative velocities depending on row type
+        # (for a rotor, upstream.W/Wt already hold the rotor-relative inlet state)
         if row.row_type == RowType.Rotor:
             V1 = upstream.W
             V2 = row.W
             Vt1 = upstream.Wt
             Vt2 = row.Wt
-            U = upstream.U
         else:
             V1 = upstream.V
             V2 = row.V
             Vt1 = upstream.Vt
             Vt2 = row.Vt
-            U = 0.0
 
         V1_mag = np.maximum(np.abs(V1), 1e-6)
         V2_mag = np.abs(V2)
         dVt = Vt2 - Vt1
+        sigma = np.maximum(np.asarray(row.solidity, dtype=float), 1e-6)
 
-        df = 1.0 - V2_mag / V1_mag + dVt / np.maximum(np.abs(U), 1e-6)
+        # Lieblein diffusion factor: DF = 1 - V2/V1 + |dVt| / (2 sigma V1)
+        df = 1.0 - V2_mag / V1_mag + np.abs(dVt) / (2.0 * sigma * V1_mag)
 
         # Map diffusion factor to Yp
         Yp = np.zeros_like(row.percent_hub_shroud, dtype=float)
