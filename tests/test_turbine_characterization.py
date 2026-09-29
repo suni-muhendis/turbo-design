@@ -25,6 +25,10 @@ import pytest
 
 RTOL = 1e-9
 
+# RE-BASELINED in the Suni Muhendis fork (1.4.4+sm.1) for the radial-equilibrium fix:
+# radeq used dP/dr where the static pressure P belongs in dP0/dr. Every golden that
+# moved, moved because of that commit; see MODIFICATIONS.md.
+
 
 # ---------------------------------------------------------------------------
 # examples/EEE-HPT/eee_hpt.py -- 2-stage axial turbine, SLSQP multi-stage pressure
@@ -61,117 +65,63 @@ def test_eee_hpt_massflow_attribute_is_the_input_echo(example_spool):
 @pytest.mark.slow
 def test_eee_hpt_stator1_per_streamline(example_spool):
     row = example_spool("EEE-HPT/eee_hpt.py")["stator1"]
-    assert row.P0 == pytest.approx([1230685.1033527565] * 5, rel=RTOL)
-    assert row.T0 == pytest.approx([1587.0] * 5, rel=RTOL)
+    assert row.P0 == pytest.approx([1230586.8909893231, 1230586.8909893231, 1230586.8909893231, 1230586.8909893231, 1230586.8909893231], rel=RTOL)
+    assert row.T0 == pytest.approx([1587.0, 1587.0, 1587.0, 1587.0, 1587.0], rel=RTOL)
     assert row.M == pytest.approx(
-        [
-            0.8990650500794771,
-            0.8736662763893313,
-            0.8500893087709246,
-            0.8281297103681706,
-            0.807549006621581,
-        ],
+        [0.9013025604420105, 0.8758399828279942, 0.8522029316054892, 0.8301925230055965, 0.8095729849451481],
         rel=RTOL,
     )
-    assert row.Yp == pytest.approx([0.057] * 5, rel=RTOL)
+    assert row.Yp == pytest.approx([0.057, 0.057, 0.057, 0.057, 0.057], rel=RTOL)
 
 
 @pytest.mark.slow
 def test_eee_hpt_rotor1_per_streamline(example_spool):
     row = example_spool("EEE-HPT/eee_hpt.py")["rotor1"]
     assert row.P0 == pytest.approx(
-        [
-            577297.9004998863,
-            568371.6156954058,
-            560972.0746986346,
-            554881.9743179418,
-            549985.6928300606,
-        ],
+        [566058.2902899861, 562501.8003719215, 559941.1458236862, 557918.5563441236, 556584.4802341909],
         rel=RTOL,
     )
     assert row.T0 == pytest.approx(
-        [
-            1343.777660231714,
-            1338.6877145286628,
-            1334.4269183790007,
-            1330.8946729690774,
-            1328.0399107216124,
-        ],
+        [1337.7307157470466, 1335.5186126135973, 1333.892602188266, 1332.6020132305794, 1331.7284895551684],
         rel=RTOL,
     )
     assert row.M == pytest.approx(
-        [
-            0.39117743813276484,
-            0.3761588973495466,
-            0.36374093364603316,
-            0.35369519099784186,
-            0.34570900099550095,
-        ],
+        [0.41379522819051473, 0.38624209929488906, 0.3639823251420871, 0.3469842287577223, 0.33415874484081354],
         rel=RTOL,
     )
-    assert row.Yp == pytest.approx([0.088] * 5, rel=RTOL)
+    assert row.Yp == pytest.approx([0.088, 0.088, 0.088, 0.088, 0.088], rel=RTOL)
 
 
 @pytest.mark.slow
 def test_eee_hpt_stator2_per_streamline(example_spool):
     row = example_spool("EEE-HPT/eee_hpt.py")["stator2"]
     assert row.P0 == pytest.approx(
-        [
-            563313.461468955,
-            555003.0903159837,
-            548114.1176479898,
-            542444.2341935647,
-            537885.7961283474,
-        ],
+        [552705.4620553899, 549394.3699416717, 547010.4005572646, 545127.3697517918, 543885.3448934446],
         rel=RTOL,
     )
     assert row.M == pytest.approx(
-        [
-            0.8619107764860644,
-            0.8193884851526166,
-            0.7822737806842567,
-            0.7496367600866443,
-            0.7205197559620639,
-        ],
+        [0.8744076047404354, 0.8270816363334431, 0.7860962086410946, 0.7506139303473779, 0.7193574624191791],
         rel=RTOL,
     )
-    assert row.Yp == pytest.approx([0.069] * 5, rel=RTOL)
+    assert row.Yp == pytest.approx([0.069, 0.069, 0.069, 0.069, 0.069], rel=RTOL)
 
 
 @pytest.mark.slow
 def test_eee_hpt_rotor2_per_streamline(example_spool):
     row = example_spool("EEE-HPT/eee_hpt.py")["rotor2"]
     assert row.P0 == pytest.approx(
-        [
-            270008.0560312047,
-            263679.00861656386,
-            259563.76257965388,
-            257256.5993644746,
-            256566.7659620641,
-        ],
+        [264603.7626407024, 261040.00533826486, 259125.33158472396, 258024.59371648557, 257833.66366584634],
         rel=RTOL,
     )
     assert row.T0 == pytest.approx(
-        [
-            1135.6337781208392,
-            1128.9786951588076,
-            1124.5173225909516,
-            1121.9083188087027,
-            1120.9882996604204,
-        ],
+        [1130.2068148039295, 1126.3244344821946, 1124.1410713558068, 1122.8295622459968, 1122.4912540564746],
         rel=RTOL,
     )
     assert row.M == pytest.approx(
-        [
-            0.4721771422716526,
-            0.4490061806305021,
-            0.4320046568567541,
-            0.4201856361503476,
-            0.41257450730510703,
-        ],
+        [0.4962649909319989, 0.45613552292012216, 0.42889965441205585, 0.4132249512076619, 0.4052460089703709],
         rel=RTOL,
     )
-    assert row.Yp == pytest.approx([0.014] * 5, rel=RTOL)
+    assert row.Yp == pytest.approx([0.014, 0.014, 0.014, 0.014, 0.014], rel=RTOL)
 
 
 @pytest.mark.slow
@@ -187,10 +137,10 @@ def test_eee_hpt_slsqp_tripwire(example_spool):
     anything that needs to be exact, prefer the per-row assertions above.
     """
     spool = example_spool("EEE-HPT/eee_hpt.py")["spool"]
-    assert len(spool.convergence_history) == 122
+    assert len(spool.convergence_history) == 119
     last = spool.convergence_history[-1]
-    assert last["massflow_std"] == pytest.approx(0.0010938616316103174, rel=1e-6)
-    assert last["massflow"] == pytest.approx(29.24807564010687, rel=1e-6)
+    assert last["massflow_std"] == pytest.approx(0.0011267336808817162, rel=1e-6)
+    assert last["massflow"] == pytest.approx(29.263924040194947, rel=1e-6)
 
 
 # ---------------------------------------------------------------------------
@@ -252,11 +202,11 @@ def test_radial_turbine_massflow_attribute_is_the_input_echo(example_spool):
 
 def test_radial_turbine_stator_per_streamline(example_spool):
     row = example_spool("radial-turbine/radial_turbine-1D.py")["stator"]
-    assert row.P0 == pytest.approx([536657.313099755] * 5, rel=RTOL)
-    assert row.T0 == pytest.approx([1222.8779357137] * 5, rel=RTOL)
+    assert row.P0 == pytest.approx([536657.313099755, 536657.313099755, 536657.313099755, 536657.313099755, 536657.313099755], rel=RTOL)
+    assert row.T0 == pytest.approx([1222.8779357137, 1222.8779357137, 1222.8779357137, 1222.8779357137, 1222.8779357137], rel=RTOL)
     # was 0.42080703647747797 before the area fix; P0/T0/Yp are unchanged by it.
-    assert row.M == pytest.approx([0.4513929387749093] * 5, rel=RTOL)
-    assert row.Yp == pytest.approx([0.0] * 5, abs=1e-12)
+    assert row.M == pytest.approx([0.4424214336315834, 0.4424214336315834, 0.4424214336315834, 0.4424214336315834, 0.4424214336315834], rel=RTOL)
+    assert row.Yp == pytest.approx([0.0, 0.0, 0.0, 0.0, 0.0], abs=1e-12)
 
 
 def test_radial_turbine_rotor_per_streamline(example_spool):
@@ -273,41 +223,23 @@ def test_radial_turbine_rotor_per_streamline(example_spool):
     # pre-fix P0: [443074.15148622065, 437651.6584138988, 428537.84499390324,
     #              418045.0960861983, 409980.2644715815]
     assert row.P0 == pytest.approx(
-        [
-            412056.3563251393,
-            407908.888988232,
-            400886.9282946781,
-            392884.9625809787,
-            387273.3747435612,
-        ],
+        [410941.57858797745, 407129.00856657594, 401943.79639491363, 398205.07437928714, 398256.32040030503],
         rel=RTOL,
     )
     # pre-fix T0: [1161.8429099481775, 1158.73767317465, 1153.2557718494477,
     #              1146.9118258635594, 1142.398479508869]
     assert row.T0 == pytest.approx(
-        [
-            1159.8683862595994,
-            1156.879603588391,
-            1151.7508248515,
-            1145.8315941226151,
-            1141.6693063933503,
-        ],
+        [1159.130304400639, 1156.3816565382936, 1152.612666536613, 1149.9091102636341, 1150.051217602391],
         rel=RTOL,
     )
     # pre-fix M: [1.269577634397641, 0.9756593824217092, 0.882204528319701,
     #             0.837409532372009, 0.7773593618539902]
     assert row.M == pytest.approx(
-        [
-            1.147197401823308,
-            0.8987584167242614,
-            0.8166867358070425,
-            0.7765727523624701,
-            0.7211693585730535,
-        ],
+        [1.3172382788958101, 0.9816257651045844, 0.8193500544745681, 0.6876230181258103, 0.5562643898518076],
         rel=RTOL,
     )
     # Yp is set by the loss model, not the area, and is unchanged by the fix.
-    assert row.Yp == pytest.approx([0.1358751871641363] * 5, rel=RTOL)
+    assert row.Yp == pytest.approx([0.1358751871641363, 0.1358751871641363, 0.1358751871641363, 0.1358751871641363, 0.1358751871641363], rel=RTOL)
 
 
 def test_radial_turbine_convergence_tripwire(example_spool):
@@ -319,11 +251,11 @@ def test_radial_turbine_convergence_tripwire(example_spool):
     lands, not how hard it was to get there. The #40 rotor P0R fix took it to 16.
     """
     spool = example_spool("radial-turbine/radial_turbine-1D.py")["spool"]
-    assert len(spool.convergence_history) == 16
+    assert len(spool.convergence_history) == 12
     last = spool.convergence_history[-1]
     # pre-fix: massflow_std 2.7887726216979658e-05, massflow 0.29864834362636516
-    assert last["massflow_std"] == pytest.approx(3.942356690378457e-05, rel=1e-6)
-    assert last["massflow"] == pytest.approx(0.31551515043727607, rel=1e-6)
+    assert last["massflow_std"] == pytest.approx(3.2089620011832576e-05, rel=1e-6)
+    assert last["massflow"] == pytest.approx(0.3106551150615096, rel=1e-6)
 
 
 @pytest.mark.slow
